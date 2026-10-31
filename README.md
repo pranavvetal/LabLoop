@@ -2,7 +2,7 @@
 
 > **Unlocking Underused Equipment & Spaces** — A trusted platform for academic makerspaces, shared labs, and fabrication facilities. Featuring verified eligibility, explainable fair-share allocation, tamper-evident SHA-256 audit trails, and strict human-in-the-loop oversight.
 
-Built for the 48-Hour Hackathon • Next.js 14 App Router • TypeScript • Tailwind CSS • Web Crypto API
+Built for the  Hackathon • Next.js 14 App Router • TypeScript • Tailwind CSS • Web Crypto API
 
 ---
 
