@@ -23,7 +23,7 @@ export default function OwnerDashboard() {
       prev.map((r) => (r.id === id ? { ...r, status: 'confirmed' } : r))
     );
     addAuditLog({
-      actor: currentUser.name || (currentUser as any).full_name || 'Owner',
+      actor: currentUser?.name || currentUser?.full_name || 'Owner',
       action: 'APPROVE_RESERVATION',
       target: id,
       details: `Owner approved reservation ${id}`,

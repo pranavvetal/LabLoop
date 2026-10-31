@@ -71,11 +71,11 @@ export default function DiscoveryDashboard() {
       const matchesCategory = categoryFilter === 'All' || res.category === categoryFilter;
 
       const matchesEligibility = !eligibleOnly ||
-                                (res.requiredQualification === 'None' || currentUser.hasSafetyTraining);
+                                (res.requiredQualification === 'None' || Boolean(currentUser?.hasSafetyTraining));
 
       return matchesSearch && matchesCategory && matchesEligibility;
     });
-  }, [resources, searchTerm, categoryFilter, eligibleOnly, currentUser.hasSafetyTraining]);
+  }, [resources, searchTerm, categoryFilter, eligibleOnly, currentUser?.hasSafetyTraining]);
 
   // Handlers
   const handleSwitchUser = (user: User) => {
@@ -96,9 +96,11 @@ export default function DiscoveryDashboard() {
     setIsVerifying(true);
     // Simulate OCR processing
     setTimeout(() => {
-      const updatedUser = { ...currentUser, hasSafetyTraining: true };
-      setCurrentUser(updatedUser);
-      localStorage.setItem('labloop_user', JSON.stringify(updatedUser));
+      if (currentUser) {
+        const updatedUser: User = { ...currentUser, hasSafetyTraining: true };
+        setCurrentUser(updatedUser);
+        localStorage.setItem('labloop_user', JSON.stringify(updatedUser));
+      }
 
       setIsVerifying(false);
       setIsVerificationModalOpen(false);
@@ -108,7 +110,7 @@ export default function DiscoveryDashboard() {
       auditLogs.unshift({
         id: `audit-${Date.now()}`,
         timestamp: new Date().toISOString(),
-        actor: currentUser.name,
+        actor: currentUser?.name || currentUser?.full_name || 'User',
         action: 'VERIFICATION_SUCCESS',
         target: 'Safety Training Certificate',
         details: `OCR extracted valid certification. hasSafetyTraining set to true.`
@@ -124,8 +126,8 @@ export default function DiscoveryDashboard() {
       id: `rev-${Date.now()}`,
       resourceId: selectedResource.id,
       resourceName: selectedResource.name,
-      userId: currentUser.id,
-      userName: currentUser.name || (currentUser as any).full_name || 'User',
+      userId: currentUser?.id || 'guest',
+      userName: currentUser?.name || (currentUser as any)?.full_name || 'User',
       startTime: new Date(Date.now() + 24 * 3600000).toISOString(),
       endTime: new Date(Date.now() + 26 * 3600000).toISOString(),
       status: status
@@ -139,7 +141,7 @@ export default function DiscoveryDashboard() {
     auditLogs.unshift({
       id: `audit-${Date.now()}`,
       timestamp: new Date().toISOString(),
-      actor: currentUser.name,
+      actor: currentUser?.name || currentUser?.full_name || 'User',
       action: status === 'waitlisted' ? 'JOIN_WAITLIST' : 'BOOKING_REQUEST',
       target: selectedResource.name,
       details: status === 'waitlisted'
@@ -169,7 +171,7 @@ export default function DiscoveryDashboard() {
             <p className="text-slate-500">Find and reserve lab equipment and makerspace tools.</p>
           </div>
 
-          {(currentUser.role === 'student' || (currentUser.role as string) === 'Student') && (
+          {(currentUser?.role === 'student' || (currentUser?.role as string) === 'Student') && (
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -244,7 +246,7 @@ export default function DiscoveryDashboard() {
         {/* Resource Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredResources.length > 0 ? (filteredResources.map((res) => {
-            const isQualified = res.requiredQualification === 'None' || currentUser.hasSafetyTraining;
+            const isQualified = res.requiredQualification === 'None' || Boolean(currentUser?.hasSafetyTraining);
 
             return (
               <div key={res.id} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:shadow-indigo-500/10 hover:border-indigo-200 transition-all duration-300 flex flex-col">
