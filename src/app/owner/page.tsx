@@ -520,7 +520,7 @@ export default function OwnerDashboard() {
         {activeTab === 'delegation' && (
           <div className="mt-6 space-y-4">
             <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl text-xs text-purple-900 leading-relaxed mb-4">
-              <strong>Delegation Policy:</strong> Equipment directors can assign a dedicated Facility Manager (e.g. Marcus Lee) to handle day-to-day check-in inspections, condition reports, and booking confirmations on specific machines.
+              <strong>Delegation Policy:</strong> Equipment directors can assign a dedicated Facility Manager (e.g. Vikram Malhotra) to handle day-to-day check-in inspections, condition reports, and booking confirmations on specific machines.
             </div>
 
             {myResources.map((res) => (
@@ -530,7 +530,7 @@ export default function OwnerDashboard() {
               >
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">{res.name}</h3>
-                  <p className="text-slate-500 mt-0.5">Assigned Manager: Marcus Lee (Facility Supervisor)</p>
+                  <p className="text-slate-500 mt-0.5">Assigned Manager: Vikram Malhotra (Facility Supervisor)</p>
                 </div>
 
                 <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-bold text-[10px] uppercase">

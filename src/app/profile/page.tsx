@@ -286,7 +286,7 @@ export default function ProfilePage() {
               Upload Safety Certification or Prerequisite Badge Proof
             </h2>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Upload PDF certificates or completion receipts (e.g. Laser Safety L2, Biosafety L1, Makerspace General). Documents will route to Lab Manager Marcus Lee for institutional endorsement.
+              Upload PDF certificates or completion receipts (e.g. Laser Safety L2, Biosafety L1, Makerspace General). Documents will route to Lab Manager Vikram Malhotra for institutional endorsement.
             </p>
             <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full font-semibold">
               <span>ℹ</span> AI OCR assists with pre-filling metadata; final approval is always confirmed by a human manager.

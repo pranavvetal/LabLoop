@@ -73,7 +73,7 @@ export function checkEligibility(
       label: 'Account Standing & Safety Record',
       status: 'fail',
       detail: `Your account is flagged for review (${user.open_incidents} open incident / ${user.no_show_count} no-shows). Reservation privileges temporarily paused.`,
-      fix_action: 'Contact facility manager Marcus Lee to resolve open safety inquiries',
+      fix_action: 'Contact facility manager Vikram Malhotra to resolve open safety inquiries',
     });
   } else {
     checks.push({

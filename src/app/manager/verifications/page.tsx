@@ -283,7 +283,7 @@ export default function VerificationsPage() {
                     <div>
                       <span className="font-bold text-slate-900">{cert.name}</span>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        Applicant: {student?.full_name} • Reviewed by Marcus Lee
+                        Applicant: {student?.full_name} • Reviewed by Vikram Malhotra
                       </p>
                       {cert.review_reason && (
                         <p className="text-[11px] text-rose-600 italic mt-0.5">

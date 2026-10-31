@@ -320,7 +320,7 @@ export default function DiscoveryPage() {
                 <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                   <div>
                     <span className="text-base font-black text-slate-900">
-                      ${res.hourly_rate}
+                      ₹${res.hourly_rate}
                     </span>
                     <span className="text-[11px] text-slate-500 font-medium"> / hour</span>
                     {res.deposit_amount > 0 && (

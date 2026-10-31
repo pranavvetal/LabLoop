@@ -65,7 +65,7 @@ export default function CheckInPage() {
 
     if (!booking) {
       setScanError(
-        `No approved reservation found for resource "${resId}" under your account. Ensure your request has been confirmed by Dr. Sarah Jenkins.`
+        `No approved reservation found for resource "${resId}" under your account. Ensure your request has been confirmed by Dr. Ananya Iyer.`
       );
       return;
     }
@@ -125,7 +125,7 @@ export default function CheckInPage() {
     if (!matchedBooking) return;
 
     if (matchedResource?.requires_supervisor && supervisorPin !== '1234') {
-      alert('Invalid Supervisor PIN. Facility supervisor Marcus Lee must provide sign-off PIN (Demo PIN: 1234).');
+      alert('Invalid Supervisor PIN. Facility supervisor Vikram Malhotra must provide sign-off PIN (Demo PIN: 1234).');
       return;
     }
 
@@ -408,7 +408,7 @@ export default function CheckInPage() {
                 Staff Supervision Required
               </h1>
               <p className="text-xs text-slate-500 mt-1">
-                This high-containment asset requires on-site supervisor endorsement before firing. Marcus Lee must enter safety PIN.
+                This high-containment asset requires on-site supervisor endorsement before firing. Vikram Malhotra must enter safety PIN.
               </p>
             </div>
 

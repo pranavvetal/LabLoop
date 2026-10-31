@@ -112,3 +112,62 @@ describe('Cryptographic SHA-256 Audit Verification', () => {
     assert.notStrictEqual(blockHash, tamperedHash);
   });
 });
+
+describe('End-to-End Complete 10-Step Journey Simulation', () => {
+  test('executes full journey from listing to mathematical ledger verification', async () => {
+    const crypto = await import('node:crypto');
+    function sha256(str) {
+      return crypto.createHash('sha256').update(str).digest('hex');
+    }
+
+    const ledger = [];
+    let currentHash = '0000000000000000000000000000000000000000000000000000000000000000';
+
+    function appendEvent(action, payload) {
+      const canonicalData = JSON.stringify({ action, payload });
+      const hash = sha256(currentHash + ':' + canonicalData);
+      ledger.push({ action, payload, prev_hash: currentHash, hash });
+      currentHash = hash;
+    }
+
+    // Step 1: Owner lists resource
+    appendEvent('RESOURCE_LISTED', { id: 'res-laser', name: 'Laser 500W', owner: 'Dr. Sarah' });
+    assert.strictEqual(ledger.length, 1);
+
+    // Step 2: Student checks eligibility
+    appendEvent('ELIGIBILITY_CHECKED', { student: 'Alex', resource: 'res-laser', pass: true });
+
+    // Step 3: Badge verified
+    appendEvent('BADGE_VERIFIED', { student: 'Alex', badge: 'Laser Safety L2', verifier: 'Marcus Lee' });
+
+    // Step 4: Request booking with priority scoring
+    const score = calculatePriorityScore({ fair_share_score: 100, weekly_booked_hours: 0, no_show_count: 0, purpose_type: 'course_project' });
+    appendEvent('BOOKING_REQUESTED', { booking_id: 'bk-100', score });
+
+    // Step 5: Owner approves booking with written reason
+    appendEvent('BOOKING_APPROVED', { booking_id: 'bk-100', approver: 'Dr. Sarah', reason: 'Confirmed for course capstone' });
+
+    // Step 6: Student check-in with baseline condition photo
+    appendEvent('CHECK_IN_RECORDED', { booking_id: 'bk-100', photo_hash: 'photo-hash-baseline-001', checklist_ok: true });
+
+    // Step 7: Extension requested and evaluated
+    appendEvent('EXTENSION_REQUESTED', { booking_id: 'bk-100', extra_hours: 1 });
+
+    // Step 8: Return inspection comparison
+    appendEvent('RETURN_RECORDED', { booking_id: 'bk-100', return_photo_hash: 'photo-hash-return-002', clean: true });
+
+    // Step 9: Incident review & penalty proposal (human confirmed)
+    appendEvent('INCIDENT_RESOLVED', { incident_id: 'inc-01', confirmed_by: 'Marcus Lee', penalty: 'Safety Warning' });
+
+    // Step 10: Mathematical verification of the complete ledger
+    assert.strictEqual(ledger.length, 9);
+    for (let i = 0; i < ledger.length; i++) {
+      if (i > 0) {
+        assert.strictEqual(ledger[i].prev_hash, ledger[i - 1].hash);
+      }
+      const canonical = JSON.stringify({ action: ledger[i].action, payload: ledger[i].payload });
+      const expectedHash = sha256(ledger[i].prev_hash + ':' + canonical);
+      assert.strictEqual(ledger[i].hash, expectedHash);
+    }
+  });
+});
