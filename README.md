@@ -39,15 +39,17 @@ npm test
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) in your browser.
+Live demo: [https://labloop-go37.onrender.com](https://labloop-go37.onrender.com)
 
-> **One-Click Demo Setup**: Visit [http://localhost:3000/admin/demo](http://localhost:3000/admin/demo) to load judge personas, simulate busy weeks, simulate overdue sessions, or advance demo time.
+(If running locally with `npm run dev`, the app is served at `http://localhost:3000`.)
+
+> **One-Click Demo Setup**: Visit [https://labloop-go37.onrender.com/admin/demo](https://labloop-go37.onrender.com/admin/demo) to load judge personas, simulate busy weeks, simulate overdue sessions, or advance demo time.
 
 ---
 
 ## 🧪 10-Step Judge Evaluation Journey (Completed by 1 Person)
 
-LabLoop provides 6 pre-configured demo personas with instantaneous 1-click persona switching from the top navigation bar or the [`/login`](http://localhost:3000/login) page.
+LabLoop provides 6 pre-configured demo personas with instantaneous 1-click persona switching from the top navigation bar or the [`/login`](https://labloop-go37.onrender.com/login) page.
 
 | Persona | Role | Credentials | Purpose |
 | :--- | :--- | :--- | :--- |
@@ -75,44 +77,44 @@ LabLoop provides 6 pre-configured demo personas with instantaneous 1-click perso
 3. **Step 3: Missing Badge Gating & Document Upload (`/profile`)**
    - Switch persona to **Jamie Taylor** (Novice).
    - Visit the Electron Microscope (`/resources/res-sem-001`). Notice booking is hard-locked due to missing `cleanroom-cert` and `bio-safety-l2`.
-   - Go to [`/profile`](http://localhost:3000/profile) and upload a training PDF or image (e.g. `bio-safety-cert.pdf`). Status is marked `pending_review`.
+   - Go to [`/profile`](https://labloop-go37.onrender.com/profile) and upload a training PDF or image (e.g. `bio-safety-cert.pdf`). Status is marked `pending_review`.
 
 4. **Step 4: Facility Staff Verification Queue (`/manager/verifications`)**
    - Switch persona to **Dr. Marcus Vance** (Manager).
-   - Open [`/manager/verifications`](http://localhost:3000/manager/verifications) to review Jamie's uploaded certificate.
+   - Open [`/manager/verifications`](https://labloop-go37.onrender.com/manager/verifications) to review Jamie's uploaded certificate.
    - Click **Approve & Grant Badge**. Jamie is instantly awarded the badge, written to the audit ledger.
 
 5. **Step 5: Owner Review Queue & Conflict Handling (`/owner`)**
    - Switch persona to **Dr. Sarah Jenkins** (Owner).
-   - Navigate to [`/owner`](http://localhost:3000/owner). Review pending booking requests.
+   - Navigate to [`/owner`](https://labloop-go37.onrender.com/owner). Review pending booking requests.
    - For conflicting requests, view the AI/Rule-based priority recommendation and conflict slot suggestions.
    - Click **Approve**. LabLoop re-checks slot availability atomically before approval and requires written justification.
 
 6. **Step 6: Printable Placard & Hardware QR Generation (`/resources/[id]/qr`)**
-   - As Dr. Sarah, visit [`/resources/res-laser-001/qr`](http://localhost:3000/resources/res-laser-001/qr).
+   - As Dr. Sarah, visit [`/resources/res-laser-001/qr`](https://labloop-go37.onrender.com/resources/res-laser-001/qr).
    - View the equipment placard with cryptographic signed HMAC verification token and `window.print()` support for physical mounting.
 
 7. **Step 7: Check-In Kiosk & Baseline Condition Report (`/checkin`)**
    - Switch persona back to **Alex Chen** (Student).
-   - Open [`/checkin`](http://localhost:3000/checkin).
+   - Open [`/checkin`](https://labloop-go37.onrender.com/checkin).
    - Enter booking code or click **"Simulate Scan"**.
    - Complete safety checklist, enter Supervisor PIN (`1234` for high-risk equipment), take/upload a baseline condition photo, and click **Confirm Check-in**.
 
 8. **Step 8: Return Kiosk, Before/After Comparison & Incident Filing (`/return`)**
-   - Open [`/return`](http://localhost:3000/return).
+   - Open [`/return`](https://labloop-go37.onrender.com/return).
    - See side-by-side **Before (Baseline) vs. After (Current)** photo inspection.
    - Select **"Report Abnormality / Minor Damage"**.
    - Fill out the damage brief and submit return. The system flags the session for human review and routes to the incident desk.
 
 9. **Step 9: Neutral Incident Review & Human Confirmation (`/owner/incidents`)**
    - Switch persona to **Dr. Sarah Jenkins** (Owner).
-   - Open [`/owner/incidents`](http://localhost:3000/owner/incidents).
+   - Open [`/owner/incidents`](https://labloop-go37.onrender.com/owner/incidents).
    - Read the neutral incident summary (structured with timeline, damage report, and impact assessment).
    - Human owner selects resolution (e.g. *Written Warning*, *Equipment Suspension*, or *No Fault*). An appeal window is automatically provided.
 
 10. **Step 10: Cryptographic Chain Verification & Tamper Demo (`/audit`)**
     - Switch persona to **Elena Rostova** (Admin).
-    - Open [`/audit`](http://localhost:3000/audit).
+    - Open [`/audit`](https://labloop-go37.onrender.com/audit).
     - Click **"Verify Cryptographic Integrity"** — the Web Crypto SHA-256 engine checks every block hash against `previous_hash` and payload content. Status: `CHAIN VALID (100% Intact)`.
     - Click **"Simulate Tamper on Block"** to alter a past record. Re-verify: the ledger flags the exact block index where the hash chain breaks!
     - Click **"Repair Chain"** to recalculate hashes or restore from seed.
