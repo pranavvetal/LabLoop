@@ -47,7 +47,7 @@ Live demo: [https://labloop-go37.onrender.com](https://labloop-go37.onrender.com
 
 ---
 
-## 🧪 10-Step Judge Evaluation Journey (Completed by 1 Person)
+## 🧪 10-Step Judge Evaluation Journey 
 
 LabLoop provides 6 pre-configured demo personas with instantaneous 1-click persona switching from the top navigation bar or the [`/login`](https://labloop-go37.onrender.com/login) page.
 
