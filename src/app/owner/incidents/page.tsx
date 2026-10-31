@@ -5,6 +5,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { useAppContext } from '@/lib/context';
 import { runOverdueCheck } from '@/lib/overdue';
@@ -12,6 +13,7 @@ import { Incident, IncidentType, IncidentSeverity, IncidentStatus } from '@/lib/
 import { can } from '@/lib/permissions';
 
 export default function IncidentsPage() {
+  const router = useRouter();
   const {
     currentUser,
     incidents,
