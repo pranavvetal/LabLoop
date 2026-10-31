@@ -28,6 +28,7 @@ import {
   createBooking as dbCreateBooking,
   createResource as dbCreateResource,
   updateResource as dbUpdateResource,
+  deleteResource as dbDeleteResource,
   createIncident as dbCreateIncident,
   updateIncident as dbUpdateIncident,
   addNotification as dbAddNotification,
@@ -86,6 +87,8 @@ interface AppContextProps {
   resolveIncident: (incidentId: string, resolution: string, penaltyConfirmed?: boolean) => Promise<Incident>;
   updateResourceStatus: (resourceId: string, status: 'available' | 'maintenance' | 'retired', reason?: string) => Promise<Resource>;
   createResource: (resource: Resource) => Promise<Resource>;
+  updateResource: (id: string, updates: Partial<Resource>) => Promise<Resource>;
+  deleteResource: (id: string) => Promise<void>;
   verifyBadge: (userBadgeId: string) => Promise<UserBadge>;
   requestExtension: (bookingId: string, extraHours: number) => Promise<Booking>;
   markNotificationRead: (id: string) => void;
@@ -543,6 +546,32 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return created;
   };
 
+  const updateResource = async (id: string, updates: Partial<Resource>): Promise<Resource> => {
+    const updated = dbUpdateResource(id, updates);
+    await logAudit(
+      'RESOURCE_UPDATED',
+      'resource',
+      id,
+      `Resource ${updated.name} updated by ${currentUser?.full_name}`,
+      { updates }
+    );
+    refreshDB();
+    return updated;
+  };
+
+  const deleteResource = async (id: string): Promise<void> => {
+    const res = db.resources.find(r => r.id === id);
+    dbDeleteResource(id);
+    await logAudit(
+      'RESOURCE_DELETED',
+      'resource',
+      id,
+      `Resource ${res?.name || id} removed from catalog by ${currentUser?.full_name}`,
+      { resource_name: res?.name }
+    );
+    refreshDB();
+  };
+
   const verifyBadge = async (userBadgeId: string): Promise<UserBadge> => {
     const verified = dbVerifyUserBadge(userBadgeId, currentUser?.id || 'admin');
     await logAudit(
@@ -617,6 +646,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         resolveIncident,
         updateResourceStatus,
         createResource,
+        updateResource,
+        deleteResource,
         verifyBadge,
         requestExtension,
         markNotificationRead,

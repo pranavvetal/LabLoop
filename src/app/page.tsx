@@ -199,7 +199,7 @@ export default function DiscoveryPage() {
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-full accent-indigo-600"
             />
-            <span className="font-bold text-indigo-900 w-12 text-right">${maxPrice}/hr</span>
+            <span className="font-bold text-indigo-900 w-12 text-right">₹{maxPrice}/hr</span>
           </div>
 
           {/* Sort By Select */}
@@ -320,12 +320,12 @@ export default function DiscoveryPage() {
                 <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
                   <div>
                     <span className="text-base font-black text-slate-900">
-                      ₹${res.hourly_rate}
+                      ₹{res.hourly_rate}
                     </span>
                     <span className="text-[11px] text-slate-500 font-medium"> / hour</span>
                     {res.deposit_amount > 0 && (
                       <span className="text-[10px] text-slate-400 block">
-                        +${res.deposit_amount} credit hold
+                        +₹{res.deposit_amount} credit hold
                       </span>
                     )}
                   </div>

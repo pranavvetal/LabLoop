@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
           messages: [
             {
               role: 'user',
-              content: `Recommend equipment for: "${need}". Available equipment: 
+              content: `Recommend equipment for: "₹{need}". Available equipment: 
               1. Industrial Laser Cutter 500W (id: res-laser, wood/acrylic/cutting, req: badge-laser_safety_l2, tier 1)
               2. Monomer 3D Printer (id: res-3dprint, carbon fiber/PEEK/PLA, tier 0)
               3. Bio-Inoculation Incubator (id: res-bio, cell culture/enzymes, req: badge-biosafety_l1, tier 2)

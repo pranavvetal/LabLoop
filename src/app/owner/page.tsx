@@ -24,6 +24,7 @@ export default function OwnerDashboard() {
     rejectBooking,
     waitlistBooking,
     updateResourceStatus,
+    deleteResource,
     logAudit,
     isMounted,
   } = useAppContext();
@@ -505,10 +506,23 @@ export default function OwnerDashboard() {
                   </button>
 
                   <button
-                    onClick={() => router.push(`/resources/${res.id}`)}
+                    onClick={() => router.push(`/owner/resources/${res.id}/edit`)}
                     className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-bold hover:bg-indigo-100 transition"
                   >
-                    View Listing →
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (confirm(`Are you sure you want to delete ${res.name}?`)) {
+                        await deleteResource(res.id);
+                        setActionNotice(`${res.name} deleted.`);
+                        setTimeout(() => setActionNotice(null), 4000);
+                      }
+                    }}
+                    className="px-4 py-2 bg-rose-50 text-rose-700 rounded-xl font-bold hover:bg-rose-100 transition"
+                  >
+                    Delete
                   </button>
                 </div>
               </div>

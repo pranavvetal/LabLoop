@@ -111,7 +111,7 @@ export async function verifyAuditChain(
         valid: false,
         broken_at: current.id,
         index: i,
-        message: `Tamper detected on log ${current.id} (${current.action}). Payload or metadata was modified after signing. Stored: "${current.hash.slice(0, 12)}...", Recomputed: "${expectedHash.slice(0, 12)}...".`,
+        message: `Tamper detected on log ${current.id} (${current.action}). Payload or metadata was modified after signing. Stored: "₹{current.hash.slice(0, 12)}...", Recomputed: "₹{expectedHash.slice(0, 12)}...".`,
       };
     }
   }

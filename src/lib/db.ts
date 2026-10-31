@@ -194,6 +194,12 @@ export function updateResource(id: string, updates: Partial<Resource>): Resource
   return updated;
 }
 
+export function deleteResource(id: string): void {
+  const db = getDB();
+  db.resources = db.resources.filter((r) => r.id !== id);
+  saveDB(db);
+}
+
 // Bookings
 export function getBookings(): Booking[] {
   return getDB().bookings;

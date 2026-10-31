@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Deterministic 3-line neutral fallback
-    const fallbackBrief = `1. Incident classified as "${incident_type || 'unspecified'}" based on physical inspection.\n2. Reported anomaly: ${description.slice(0, 90)}...\n3. Recommendation: Review before/after condition photos; confirm deductible proposal with facility director.`;
+    const fallbackBrief = `1. Incident classified as "₹{incident_type || 'unspecified'}" based on physical inspection.\n2. Reported anomaly: ${description.slice(0, 90)}...\n3. Recommendation: Review before/after condition photos; confirm deductible proposal with facility director.`;
 
     return NextResponse.json({
       source: 'fallback',

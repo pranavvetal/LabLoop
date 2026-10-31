@@ -262,12 +262,12 @@ export default function ResourceDetailPage() {
 
                   <div className="text-right">
                     <span className="text-2xl font-black text-indigo-900">
-                      ₹${resource.hourly_rate}
+                      ₹{resource.hourly_rate}
                     </span>
                     <span className="text-xs text-slate-500"> / hour</span>
                     {resource.deposit_amount > 0 && (
                       <span className="text-[11px] text-slate-400 block font-medium">
-                        +₹${resource.deposit_amount} refundable security hold
+                        +₹{resource.deposit_amount} refundable security hold
                       </span>
                     )}
                   </div>
@@ -567,7 +567,7 @@ export default function ResourceDetailPage() {
                 {/* Cost Preview */}
                 <div className="pt-2 border-t border-slate-100 flex justify-between items-center">
                   <span className="font-bold text-slate-600">Estimated Total ({durationHours} hrs):</span>
-                  <span className="text-base font-black text-indigo-900">₹${totalCost}</span>
+                  <span className="text-base font-black text-indigo-900">₹{totalCost}</span>
                 </div>
 
                 <button
