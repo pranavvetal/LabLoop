@@ -1,27 +1,36 @@
+"use client";
 import React, { useState } from 'react';
 import { mockUsers, User } from '../lib/store';
 
 interface NavbarProps {
-  currentUser: User;
-  onSwitchUser: (user: User) => void;
-  currentPath: string;
-  onNavigate: (path: string) => void;
+  currentUser?: User;
+  onSwitchUser?: (user: User) => void;
+  currentPath?: string;
+  onNavigate?: (path: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  currentUser,
-  onSwitchUser,
-  currentPath,
-  onNavigate,
+  currentUser: propUser,
+  onSwitchUser: propOnSwitchUser,
+  currentPath: propCurrentPath,
+  onNavigate: propOnNavigate,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const currentUser = propUser || mockUsers[0];
+  const onNavigate = propOnNavigate || ((p: string) => { window.location.href = p; });
+  const onSwitchUser = propOnSwitchUser || ((u: User) => {
+    localStorage.setItem('labloop_user', JSON.stringify(u));
+    window.location.reload();
+  });
+  const currentPath = propCurrentPath || (typeof window !== 'undefined' ? window.location.pathname : '/');
 
+const role = currentUser?.role ?? 'Student';
   const navLinks = [
     { name: 'Discovery', path: '/', roles: ['Student', 'Owner', 'Admin'] },
     { name: 'Owner Dashboard', path: '/owner', roles: ['Owner', 'Admin'] },
     { name: 'Check-in', path: '/checkin', roles: ['Student', 'Owner', 'Admin'] },
     { name: 'Audit Trail', path: '/audit', roles: ['Student', 'Owner', 'Admin'] },
-  ].filter(link => link.roles.includes(currentUser.role));
+  ].filter(link => link.roles.includes(role));
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -159,3 +168,5 @@ export const Navbar: React.FC<NavbarProps> = ({
     </nav>
   );
 };
+
+export default Navbar;

@@ -25,7 +25,7 @@ export default function ResourceDetailBookingPage() {
   const [successToast, setSuccessToast] = useState(false);
 
   const handleSwitchUser = (user: User) => {
-    setStore((prev) => ({ ...prev, currentUser: user }));
+    setStore((prev: any) => ({ ...prev, currentUser: { ...prev.currentUser, ...user } }));
   };
 
   const handleNavigate = (path: string) => {
@@ -55,7 +55,7 @@ export default function ResourceDetailBookingPage() {
       purpose: purpose || 'Prototyping session',
     };
 
-    setStore((prev) => ({
+    setStore((prev: any) => ({
       ...prev,
       reservations: [newReservation, ...prev.reservations],
     }));
@@ -123,7 +123,7 @@ export default function ResourceDetailBookingPage() {
                 {/* Specs */}
                 <div className="border-t border-gray-100 pt-4 space-y-2 text-xs">
                   <h4 className="font-bold text-gray-900 uppercase tracking-wider">Specifications</h4>
-                  {Object.entries(resource.specs).map(([key, val]) => (
+                  {Object.entries(resource.specs || {}).map(([key, val]) => (
                     <div key={key} className="flex justify-between py-1 border-b border-gray-50">
                       <span className="text-gray-500">{key}:</span>
                       <span className="font-medium text-gray-800">{val}</span>

@@ -1,25 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { Navbar } from '@/components/Navbar';
-import {
-  initialStore,
-  Resource,
-  Reservation,
-  User,
-  getBookingCountForUser,
-  mockUsers,
-  mockResources
-} from '@/lib/store';
+// Cleaned up imports: we only need React hooks, useRouter, Navbar, typings, and the store context.
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Navbar } from '@/components/Navbar';
+import { Resource, Reservation, User, getBookingCountForUser } from '@/lib/store';
+import { useStore } from '@/lib/context';
 
 export default function DiscoveryDashboard() {
   const router = useRouter();
 
-  // State from store / persistence
-  const [currentUser, setCurrentUser] = useState<User>(mockUsers[0]);
-  const [resources, setResources] = useState<Resource[]>(mockResources);
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+    const { currentUser, setCurrentUser, resources, reservations, setReservations, dailyQuota, userBookingsToday, isQuotaReached, addAuditLog } = useStore();
+
+
+
 
   // UI State
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,39 +24,43 @@ export default function DiscoveryDashboard() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Initialize data from localStorage
-  useEffect(() => {
-    const savedUser = localStorage.getItem('labloop_user');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
+  // Removed duplicate reservations state and related effects – using store's reservations and derived values
+// const [reservations, setReservations] = useState<Reservation[]>([]);
+// 
+// // Initialize data from localStorage (handled in StoreProvider)
+// useEffect(() => {
+//   const savedUser = localStorage.getItem('labloop_user');
+//   if (savedUser) {
+//     setCurrentUser(JSON.parse(savedUser));
+//   }
+// 
+//   const savedReservations = localStorage.getItem('labloop_reservations');
+//   if (savedReservations) {
+//     setReservations(JSON.parse(savedReservations));
+//   } else {
+//     setReservations(initialStore.reservations);
+//     localStorage.setItem('labloop_reservations', JSON.stringify(initialStore.reservations));
+//   }
+// }, []);
 
-    const savedReservations = localStorage.getItem('labloop_reservations');
-    if (savedReservations) {
-      setReservations(JSON.parse(savedReservations));
-    } else {
-      setReservations(initialStore.reservations);
-      localStorage.setItem('labloop_reservations', JSON.stringify(initialStore.reservations));
-    }
-  }, []);
+// // Persist reservations (handled in StoreProvider)
+// useEffect(() => {
+//   localStorage.setItem('labloop_reservations', JSON.stringify(reservations));
+// }, [reservations]);
 
-  // Update localStorage when state changes
-  useEffect(() => {
-    localStorage.setItem('labloop_user', JSON.stringify(currentUser));
-  }, [currentUser]);
+// // Derived state – already provided by StoreProvider
+// // const dailyQuota = 2;
+// // const userBookingsToday = useMemo(() =>
+// //   getBookingCountForUser(currentUser.id, reservations),
+// //   [currentUser.id, reservations]
+// // );
+// // const isQuotaReached = userBookingsToday >= dailyQuota;
+  
 
-  useEffect(() => {
-    localStorage.setItem('labloop_reservations', JSON.stringify(reservations));
-  }, [reservations]);
+
 
   // Derived State
-  const dailyQuota = 2;
-  const userBookingsToday = useMemo(() =>
-    getBookingCountForUser(currentUser.id, reservations),
-    [currentUser.id, reservations]
-  );
 
-  const isQuotaReached = userBookingsToday >= dailyQuota;
 
   const filteredResources = useMemo(() => {
     return resources.filter(res => {
@@ -127,7 +125,7 @@ export default function DiscoveryDashboard() {
       resourceId: selectedResource.id,
       resourceName: selectedResource.name,
       userId: currentUser.id,
-      userName: currentUser.name,
+      userName: currentUser.name || (currentUser as any).full_name || 'User',
       startTime: new Date(Date.now() + 24 * 3600000).toISOString(),
       endTime: new Date(Date.now() + 26 * 3600000).toISOString(),
       status: status
@@ -171,7 +169,7 @@ export default function DiscoveryDashboard() {
             <p className="text-slate-500">Find and reserve lab equipment and makerspace tools.</p>
           </div>
 
-          {currentUser.role === 'Student' && (
+          {(currentUser.role === 'student' || (currentUser.role as string) === 'Student') && (
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -465,15 +463,17 @@ export default function DiscoveryDashboard() {
 }
 
 function StatusBadge({ status }: { status: Resource['status'] }) {
-  const styles = {
+  const styles: Record<string, string> = {
     available: 'bg-emerald-100 text-emerald-700 border-emerald-200',
     maintenance: 'bg-rose-100 text-rose-700 border-rose-200',
+    retired: 'bg-slate-100 text-slate-700 border-slate-200',
     'in-use': 'bg-indigo-100 text-indigo-700 border-indigo-200',
   };
 
-  const labels = {
+  const labels: Record<string, string> = {
     available: 'Available',
     maintenance: 'In Maintenance',
+    retired: 'Retired',
     'in-use': 'In Use',
   };
 

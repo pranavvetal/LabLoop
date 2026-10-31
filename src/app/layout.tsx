@@ -1,5 +1,6 @@
 import React from 'react';
 import './globals.css';
+import { StoreProvider } from '@/lib/context';
 
 export default function RootLayout({
   children,
@@ -8,7 +9,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased bg-slate-50 text-slate-900">{children}</body>
+      <body className="font-sans antialiased bg-slate-50 text-slate-900">
+        <StoreProvider>{children}</StoreProvider>
+      </body>
     </html>
   );
 }

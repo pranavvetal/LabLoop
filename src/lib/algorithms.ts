@@ -7,6 +7,7 @@ import type { PurposeType } from './types';
 // Base weights for different booking purposes
 export const PURPOSE_WEIGHTS: Record<PurposeType, number> = {
   course_project: 50,
+  research: 45,
   startup_prototype: 35,
   casual_use: 20,
 };
@@ -53,7 +54,7 @@ export function exceedsDailyQuota(
  * Every booking outcome returns a human-readable reason code.
  */
 export function explainDecision(
-  status: 'approved' | 'waitlisted' | 'rejected',
+  status: 'approved' | 'waitlisted' | 'rejected' | 'pending_review',
   ctx: {
     priority_score?: number;
     position?: number;
@@ -66,6 +67,11 @@ export function explainDecision(
   const score = ctx.priority_score ?? 0;
 
   switch (status) {
+    case 'pending_review':
+      return {
+        explanation_code: 'PENDING_HUMAN_REVIEW',
+        message: `Request submitted for owner/manager review. Priority score is ${score}.`,
+      };
     case 'approved':
       if (score >= 70) {
         return {
