@@ -22,6 +22,9 @@ import { computeEntryHash } from './audit';
 export const STORAGE_KEY = 'labloop_v1';
 export const CURRENT_USER_KEY = 'labloop_current_user_id';
 
+/** Where a read/write ultimately resolved: the shared server or local storage. */
+export type SyncSource = 'server' | 'fallback';
+
 export interface LabloopDB {
   version: number;
   badges: Badge[];
@@ -143,6 +146,94 @@ export function resetDemoData(): LabloopDB {
     saveDB(validDb);
   });
   return seed;
+}
+
+// ============================================================
+// Server-Sync API (async, shared across devices)
+// ============================================================
+
+const API_BASE = '';
+
+function isServerAvailable(): boolean {
+  return typeof window !== 'undefined';
+}
+
+/**
+ * Fetch the authoritative DB from the shared backend. On any failure
+ * (offline, dev server down, network error) we transparently fall back
+ * to the local localStorage copy so the app keeps working.
+ */
+export async function fetchDB(): Promise<{ db: LabloopDB; source: SyncSource }> {
+  if (!isServerAvailable()) return { db: getDB(), source: 'fallback' };
+  try {
+    const res = await fetch(`${API_BASE}/api/db`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const body = (await res.json()) as { db?: LabloopDB };
+    if (!body?.db) throw new Error('Empty server response');
+    // Cache the authoritative snapshot locally so offline reads are fresh.
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(body.db));
+    } catch {
+      /* ignore quota / private-mode failures */
+    }
+    notifyListeners(body.db);
+    return { db: body.db, source: 'server' };
+  } catch (err) {
+    console.warn('[db] fetchDB fell back to localStorage:', (err as Error).message);
+    return { db: getDB(), source: 'fallback' };
+  }
+}
+
+/**
+ * Persist a partial patch to the shared backend. On failure we fall back
+ * to applying the patch against the local localStorage copy.
+ */
+export async function postDB(patch: Partial<LabloopDB>): Promise<LabloopDB> {
+  if (!isServerAvailable()) {
+    const local = mergeDB(getDB(), patch);
+    saveDB(local);
+    return local;
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/db`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ db: patch }),
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({})) as { error?: string };
+      throw new Error(errBody.error || `HTTP ${res.status}`);
+    }
+    const body = (await res.json()) as { db?: LabloopDB };
+    if (!body?.db) throw new Error('Empty server response');
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(body.db));
+    } catch {
+      /* ignore */
+    }
+    notifyListeners(body.db);
+    return body.db;
+  } catch (err) {
+    console.warn('[db] postDB fell back to localStorage:', (err as Error).message);
+    const local = mergeDB(getDB(), patch);
+    saveDB(local);
+    return local;
+  }
+}
+
+/**
+ * Shallow-merge a partial DB patch onto a base DB. Top-level entity
+ * arrays are replaced wholesale when present in the patch.
+ */
+function mergeDB(base: LabloopDB, patch: Partial<LabloopDB>): LabloopDB {
+  const merged: LabloopDB = { ...base };
+  (Object.keys(patch) as Array<keyof LabloopDB>).forEach((key) => {
+    const value = patch[key];
+    if (value === undefined) return;
+    (merged as any)[key] = value;
+  });
+  return merged;
 }
 
 // ============================================================

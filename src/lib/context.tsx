@@ -36,6 +36,9 @@ import {
   addConditionReport as dbAddConditionReport,
   verifyUserBadge as dbVerifyUserBadge,
   recomputeWaitlistPositions,
+  fetchDB,
+  postDB,
+  LabloopDB,
 } from './db';
 import { can } from './permissions';
 
@@ -106,42 +109,57 @@ const AppContext = createContext<AppContextProps | null>(null);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [currentUser, setCurrentUserState] = useState<User | null>(null);
-  const [db, setDb] = useState(() => getDB());
+  const [db, setDb] = useState<LabloopDB>(() => getDB());
+  const [syncSource, setSyncSource] = useState<'server' | 'fallback'>(
+    typeof window === 'undefined' ? 'fallback' : 'server'
+  );
   const [reservationsCompat, setReservationsCompat] = useState<any[]>([]);
 
   // Reload state from DB
   const refreshDB = useCallback(() => {
-    const current = getDB();
-    setDb({ ...current });
+    fetchDB()
+      .then(({ db: server, source }) => {
+        setDb({ ...server });
+        setSyncSource(source);
+      })
+      .catch(() => {
+        const local = getDB();
+        setDb({ ...local });
+        setSyncSource('fallback');
+      });
   }, []);
 
-  // Initialize on mount
+  // Initialize on mount — load from shared server, fallback to localStorage
   useEffect(() => {
     setIsMounted(true);
-    const initial = getDB();
-    setDb(initial);
 
-    // Load active user
-    const savedUserId = localStorage.getItem(CURRENT_USER_KEY);
-    if (savedUserId) {
-      const found = initial.users.find((u) => u.id === savedUserId);
-      if (found) {
-        setCurrentUserState(found);
+    // Boot up with authoritative server data (or fallback)
+    fetchDB().then(({ db: dbSnapshot, source }) => {
+      setDb({ ...dbSnapshot });
+      setSyncSource(source);
+
+      // Load active user
+      const savedUserId = localStorage.getItem(CURRENT_USER_KEY);
+      if (savedUserId) {
+        const found = dbSnapshot.users.find((u) => u.id === savedUserId);
+        if (found) {
+          setCurrentUserState(found);
+        } else {
+          setCurrentUserState(dbSnapshot.users[0]);
+        }
       } else {
-        setCurrentUserState(initial.users[0]);
+        // Default to student Alex
+        const defaultUser = dbSnapshot.users[0];
+        setCurrentUserState(defaultUser);
+        localStorage.setItem(CURRENT_USER_KEY, defaultUser.id);
       }
-    } else {
-      // Default to student Alex
-      const defaultUser = initial.users[0];
-      setCurrentUserState(defaultUser);
-      localStorage.setItem(CURRENT_USER_KEY, defaultUser.id);
-    }
+    });
 
-    // Subscribe to cross-tab updates
+    // Subscribe to cross-tab updates (same-browser tab sync)
     const unsubscribe = onDBChange((newDb) => {
       setDb({ ...newDb });
-      if (savedUserId) {
-        const refreshedUser = newDb.users.find((u) => u.id === savedUserId);
+      if (currentUser) {
+        const refreshedUser = newDb.users.find((u) => u.id === currentUser.id);
         if (refreshedUser) setCurrentUserState(refreshedUser);
       }
     });
@@ -193,6 +211,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const requestBooking = async (booking: Booking): Promise<Booking> => {
+    // Sync the new booking to the shared server so it's visible across devices
+    const syncedDb = await postDB({ bookings: [booking, ...db.bookings] });
+    setDb({ ...syncedDb });
+
     const created = dbCreateBooking(booking);
     await logAudit(
       'BOOKING_REQUESTED',
@@ -202,7 +224,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       { priority_score: booking.priority_score, purpose_type: booking.purpose_type }
     );
     // Notify owner
-    const resource = db.resources.find((r) => r.id === booking.resource_id);
+    const resource = syncedDb.resources.find((r) => r.id === booking.resource_id);
     if (resource) {
       dbAddNotification(
         resource.owner_id,
@@ -211,7 +233,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         '/owner'
       );
     }
-    refreshDB();
     return created;
   };
 
@@ -223,7 +244,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       throw new Error('Permission denied: You cannot approve bookings for this resource.');
     }
 
-    // Atomic conflict verification
+    // Atomic conflict verification using local DB (same as before)
     const overlapping = db.bookings.filter(
       (existing) =>
         existing.id !== bookingId &&
@@ -243,6 +264,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       decision_reason: reason,
       decision_at: new Date().toISOString(),
       due_at: b.end_time,
+    });
+
+    // Sync approval to shared server so it's visible across devices
+    await postDB({
+      bookings: db.bookings.map((bk) =>
+        bk.id === bookingId ? updated : bk
+      ),
     });
 
     await logAudit(
@@ -279,6 +307,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       decision_at: new Date().toISOString(),
     });
 
+    // Sync rejection to shared server
+    await postDB({
+      bookings: db.bookings.map((bk) =>
+        bk.id === bookingId ? updated : bk
+      ),
+    });
+
     await logAudit(
       'BOOKING_REJECTED',
       'booking',
@@ -307,6 +342,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       decision_reason: reason,
     });
 
+    // Sync waitlist promotion to shared server
+    await postDB({
+      bookings: db.bookings.map((bk) =>
+        bk.id === bookingId ? updated : bk
+      ),
+      waitlist: db.waitlist,
+    });
+
     await logAudit(
       'BOOKING_WAITLISTED',
       'booking',
@@ -328,6 +371,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       decision_reason: reason,
     });
 
+    // Sync cancellation to shared server
+    await postDB({
+      bookings: db.bookings.map((bk) =>
+        bk.id === bookingId ? updated : bk
+      ),
+    });
+
     await logAudit(
       'BOOKING_CANCELLED',
       'booking',
@@ -336,7 +386,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       { reason, cancelled_by: currentUser?.id }
     );
 
-    // Waitlist promotion trigger
+    // Waitlist promotion trigger — using synced waitlist if available
     const resourceWaitlist = db.waitlist.filter((w) => w.resource_id === b.resource_id);
     if (resourceWaitlist.length > 0) {
       resourceWaitlist.sort((a, b) => a.position - b.position);
@@ -393,6 +443,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       due_at: b.end_time,
     });
 
+    // Sync check-in to shared server
+    await postDB({
+      bookings: db.bookings.map((bk) =>
+        bk.id === bookingId ? updated : bk
+      ),
+      condition_reports: db.condition_reports,
+    });
+
     dbAddConditionReport({
       id: `cr-in-${Date.now()}`,
       booking_id: bookingId,
@@ -429,6 +487,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const updated = dbUpdateBooking(bookingId, {
       status: 'returned',
       returned_at: now,
+    });
+
+    await postDB({
+      bookings: db.bookings.map((bk) => (bk.id === bookingId ? updated : bk)),
+      condition_reports: db.condition_reports,
     });
 
     dbAddConditionReport({
@@ -484,6 +547,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       );
     });
 
+    await postDB({
+      incidents: [created, ...db.incidents],
+      notifications: db.notifications,
+    });
+
     refreshDB();
     return created;
   };
@@ -498,6 +566,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       resolution,
       penalty_confirmed: penaltyConfirmed,
     });
+    await postDB({ incidents: db.incidents });
 
     await logAudit(
       'INCIDENT_RESOLVED',
@@ -516,6 +585,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     status: 'available' | 'maintenance' | 'retired',
     reason?: string
   ): Promise<Resource> => {
+    const updatedResources = db.resources.map((r) =>
+      r.id === resourceId
+        ? { ...r, status, is_active: status === 'available' }
+        : r
+    );
+    const syncedDb = await postDB({ resources: updatedResources });
+    setDb({ ...syncedDb });
+
     const updated = dbUpdateResource(resourceId, {
       status,
       is_active: status === 'available',
@@ -529,12 +606,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       { status, reason, updated_by: currentUser?.id }
     );
 
-    refreshDB();
     return updated;
   };
 
   const createResource = async (resource: Resource): Promise<Resource> => {
-    const created = dbCreateResource(resource);
+    // First update the local store via the server so the change syncs across devices
+    const syncedDb = await postDB({ resources: [resource, ...db.resources] });
+    setDb({ ...syncedDb });
+
     await logAudit(
       'RESOURCE_LISTED',
       'resource',
@@ -542,11 +621,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       `Dr. ${currentUser?.full_name || 'Owner'} published new resource ${resource.name}`,
       { category: resource.category, hourly_rate: resource.hourly_rate }
     );
-    refreshDB();
-    return created;
+    return resource;
   };
 
   const updateResource = async (id: string, updates: Partial<Resource>): Promise<Resource> => {
+    const updatedResources = db.resources.map((r) =>
+      r.id === id ? { ...r, ...updates } : r
+    );
+    const syncedDb = await postDB({ resources: updatedResources });
+    setDb({ ...syncedDb });
+
     const updated = dbUpdateResource(id, updates);
     await logAudit(
       'RESOURCE_UPDATED',
@@ -555,13 +639,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       `Resource ${updated.name} updated by ${currentUser?.full_name}`,
       { updates }
     );
-    refreshDB();
     return updated;
   };
 
   const deleteResource = async (id: string): Promise<void> => {
-    const res = db.resources.find(r => r.id === id);
+    // Sync deletion to the shared server first
+    await postDB({ resources: db.resources.filter((r) => r.id !== id) });
+    // Also remove locally
     dbDeleteResource(id);
+    const res = db.resources.find(r => r.id === id);
     await logAudit(
       'RESOURCE_DELETED',
       'resource',
@@ -569,11 +655,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       `Resource ${res?.name || id} removed from catalog by ${currentUser?.full_name}`,
       { resource_name: res?.name }
     );
-    refreshDB();
   };
 
   const verifyBadge = async (userBadgeId: string): Promise<UserBadge> => {
     const verified = dbVerifyUserBadge(userBadgeId, currentUser?.id || 'admin');
+    await postDB({ user_badges: db.user_badges });
     await logAudit(
       'BADGE_VERIFIED',
       'user_badge',
@@ -596,6 +682,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       extension_requested: true,
       extension_until: newDue,
     });
+    await postDB({ bookings: db.bookings });
 
     await logAudit(
       'EXTENSION_REQUESTED',
@@ -609,8 +696,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return updated;
   };
 
-  const markNotificationRead = (id: string) => {
+  const markNotificationRead = async (id: string) => {
     dbMarkNotificationRead(id);
+    await postDB({ notifications: db.notifications });
     refreshDB();
   };
 
