@@ -43,7 +43,7 @@ Live demo: [https://labloop-go37.onrender.com](https://labloop-go37.onrender.com
 
 (If running locally with `npm run dev`, the app is served at `http://localhost:3000`.)
 
-> **One-Click Demo Setup**: Visit [https://labloop-go37.onrender.com/admin](https://labloop-go37.onrender.com/admin/) to load judge personas, simulate busy weeks, simulate overdue sessions, or advance demo time.
+> **One-Click Demo Setup**: Visit [https://labloop-go37.onrender.com](https://labloop-go37.onrender.com) to load judge personas, simulate busy weeks, simulate overdue sessions, or advance demo time.
 
 ---
 
