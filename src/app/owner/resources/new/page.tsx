@@ -240,7 +240,7 @@ export default function NewResourcePage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
                 <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Hourly Rate ($)
+                  Hourly Rate (₹)
                 </label>
                 <input
                   type="number"
@@ -254,7 +254,7 @@ export default function NewResourcePage() {
 
               <div>
                 <label className="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Deposit Hold ($)
+                  Deposit Hold (₹)
                 </label>
                 <input
                   type="number"

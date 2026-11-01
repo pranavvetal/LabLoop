@@ -140,7 +140,7 @@ export default function BookingDetailPage() {
                 Credit Deposit Hold
               </span>
               <span className="font-bold text-slate-900 mt-0.5 block">
-                ${booking.credit_hold || 30}.00
+                ₹{booking.credit_hold || 30}.00
               </span>
               <span className="text-slate-500 text-[11px]">
                 {['returned', 'cancelled'].includes(booking.status) ? 'Hold Released ✓' : 'Held in Escrow'}

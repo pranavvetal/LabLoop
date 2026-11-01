@@ -20,7 +20,7 @@ export default function DiscoveryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState('');
   const [eligibleOnly, setEligibleOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState<number>(100);
+  const [maxPrice, setMaxPrice] = useState<number>(100000);
   const [sortBy, setSortBy] = useState<'relevance' | 'price_asc' | 'price_desc' | 'soonest'>('relevance');
 
   // Filtered & Sorted Resources
@@ -193,8 +193,8 @@ export default function DiscoveryPage() {
             <input
               type="range"
               min={0}
-              max={100}
-              step={5}
+              max={10000}
+              step={100}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-full accent-indigo-600"

@@ -341,7 +341,7 @@ export const seedResources: Resource[] = [
     description:
       'Industrial FDM 3D printer with dual direct-drive extruders capable of carbon fiber PEEK, soluble PVA supports, flexible TPU, and ESD-safe filaments with heated chamber.',
     location: 'IIT Delhi FabLab, Central Workshop, Bay 2',
-    image_url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800',
+    image_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800',
     specs: {
       'Build Volume': '350 x 350 x 400 mm',
       'Max Nozzle Temp': '450°C All-Metal Hotend',

@@ -408,8 +408,8 @@ export default function ReturnPage() {
                   onChange={(e) => setExtensionHours(Number(e.target.value))}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold cursor-pointer"
                 >
-                  <option value={1}>+1 Hour (${resource?.hourly_rate})</option>
-                  <option value={2}>+2 Hours (${(resource?.hourly_rate || 0) * 2})</option>
+                  <option value={1}>+1 Hour (₹${resource?.hourly_rate})</option>
+                  <option value={2}>+2 Hours (₹${(resource?.hourly_rate || 0) * 2})</option>
                 </select>
               </div>
 

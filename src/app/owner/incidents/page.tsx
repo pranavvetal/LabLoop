@@ -443,7 +443,7 @@ export default function IncidentsPage() {
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold cursor-pointer"
                 >
                   <option value="warning">Formal Safety Warning (No financial penalty)</option>
-                  <option value="deduction">Deposit Deduction ($25 Deductible)</option>
+                  <option value="deduction">Deposit Deduction (₹25 Deductible)</option>
                   <option value="suspension">1-Week Privilege Suspension</option>
                   <option value="no_action">Dismiss / No Action (Equipment Calibrated)</option>
                 </select>

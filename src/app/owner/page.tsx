@@ -490,7 +490,7 @@ export default function OwnerDashboard() {
                       {res.status}
                     </span>
                   </div>
-                  <p className="text-slate-500 mt-0.5">{res.location} • ${res.hourly_rate}/hr</p>
+                  <p className="text-slate-500 mt-0.5">{res.location} • ₹{res.hourly_rate}/hr</p>
                 </div>
 
                 <div className="flex items-center gap-2">
