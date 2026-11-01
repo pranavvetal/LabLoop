@@ -3,7 +3,7 @@
 > **Unlocking Underused Equipment & Spaces** — A trusted platform for academic makerspaces, shared labs, and fabrication facilities. Featuring verified eligibility, explainable fair-share allocation, tamper-evident SHA-256 audit trails, and strict human-in-the-loop oversight.
 
 ## 🚀 Live Demo
-Visit the production site: [https://labloop-go37.onrender.com/](https://labloop-go37.onrender.com/)
+Visit the production site: [https://labloop-ab7h.onrender.com/](https://labloop-ab7h.onrender.com/)
 
 ---
 
@@ -21,7 +21,7 @@ Academic institutions invest millions in high-end machinery (laser cutters, CNC 
 ## 🧪 Quick Start & Demo Journey
 
 ### 1. Persona Login
-Visit [https://labloop-go37.onrender.com/login](https://labloop-go37.onrender.com/login) to switch between personas:
+Visit [https://labloop-ab7h.onrender.com/login](https://labloop-ab7h.onrender.com/login) to switch between personas:
 | Persona | Role | Purpose |
 | :--- | :--- | :--- |
 | **Aarav Sharma** | Student | Test bookings, eligibility, fair queue |
