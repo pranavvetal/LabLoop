@@ -34,7 +34,7 @@ export default function LoginPage() {
           L
         </div>
         <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-          Yantraz Enterprise
+          LabLoop Enterprise
         </h1>
         <p className="mt-2 text-base text-slate-300 max-w-xl mx-auto">
           "Unlock Underused Equipment & Spaces" — University makerspace & lab sharing platform with explainable fair-share allocation, verifiable badge prerequisites, and cryptographic SHA-256 audit ledger.
